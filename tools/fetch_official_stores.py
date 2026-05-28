@@ -4,20 +4,52 @@ import csv
 import html
 import json
 import re
-import time
+from collections import Counter
 from datetime import date
 from pathlib import Path
-from urllib.parse import quote, urljoin
+from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 
-BASE_URL = "https://www.chage.com.tw/"
-START_URL = "https://www.chage.com.tw/edcontent.php?cid=102&lang=tw&tb=3"
+BRAND = "迷客夏"
+CHECKED_AT = "2026-05-28"
+OFFICIAL_STORE_LIST_URL = "https://www.milksha.com/store_detail.php?uID=1"
+PLANNED_SOURCE_URL = "https://www.milksha.com/en/store_detail.php?uID=22"
 OUT_DIR = Path("data")
+
+COUNTIES = [
+    "臺北市",
+    "台北市",
+    "新北市",
+    "基隆市",
+    "桃園市",
+    "新竹縣",
+    "新竹市",
+    "苗栗縣",
+    "臺中市",
+    "台中市",
+    "彰化縣",
+    "南投縣",
+    "雲林縣",
+    "嘉義縣",
+    "嘉義市",
+    "臺南市",
+    "台南市",
+    "高雄市",
+    "屏東縣",
+    "宜蘭縣",
+    "花蓮縣",
+    "台東縣",
+    "臺東縣",
+    "金門縣",
+    "澎湖縣",
+]
+
+DISTRICT_RE = re.compile(r"([^\d\s縣市]{1,8}(?:區|鄉|鎮|市))")
 
 
 def fetch(url: str) -> str:
-    req = Request(
+    request = Request(
         url,
         headers={
             "User-Agent": (
@@ -26,106 +58,99 @@ def fetch(url: str) -> str:
             )
         },
     )
-    with urlopen(req, timeout=30) as response:
+    with urlopen(request, timeout=45) as response:
         charset = response.headers.get_content_charset() or "utf-8"
         return response.read().decode(charset, errors="replace")
 
 
-def strip_tags(value: str) -> str:
+def clean_text(value: str) -> str:
     value = re.sub(r"<br\s*/?>", "\n", value, flags=re.I)
-    value = re.sub(r"</p\s*>", "\n", value, flags=re.I)
     value = re.sub(r"<[^>]+>", "", value)
     value = html.unescape(value)
     value = value.replace("\xa0", " ")
-    lines = [re.sub(r"\s+", " ", line).strip() for line in value.splitlines()]
-    return "\n".join(line for line in lines if line)
+    value = re.sub(r"[ \t]+", " ", value)
+    value = re.sub(r"\n\s+", "\n", value)
+    return value.strip()
 
 
-def normalize_field(text: str, label: str) -> str:
-    for line in text.splitlines():
-        if label not in line:
-            continue
-        value = re.sub(rf"^.*?{label}\s*[:：]\s*", "", line).strip()
-        return re.sub(r"\s+", " ", value)
-    return ""
+def normalize_county(value: str) -> str:
+    return value.replace("台北市", "臺北市").replace("台中市", "臺中市").replace("台南市", "臺南市").replace("台東縣", "臺東縣")
 
 
-def get_city_links() -> list[dict[str, str]]:
-    page = fetch(START_URL)
-    matches = re.findall(
-        r'<a href="(?P<href>https://www\.chage\.com\.tw/edcontent\.php\?lang=tw(?:&amp;|&)tb=3(?:&amp;|&)cid=(?P<cid>\d+))"[^>]*title="(?P<title>[^"]+門市)"',
-        page,
+def strip_postal_code(address: str) -> str:
+    return re.sub(r"^\s*\d{3,6}\s*", "", address).strip()
+
+
+def parse_location(address: str) -> tuple[str, str]:
+    normalized = normalize_county(strip_postal_code(address))
+    county = ""
+    for candidate in COUNTIES:
+        normalized_candidate = normalize_county(candidate)
+        if normalized_candidate in normalized:
+            county = normalized_candidate
+            break
+
+    district = ""
+    if county:
+        after_county = normalized.split(county, 1)[1]
+        match = DISTRICT_RE.search(after_county)
+        if match:
+            district = match.group(1)
+    return county, district
+
+
+def maps_search_url(name: str, address: str) -> str:
+    return f"https://www.google.com/maps/search/?api=1&query={quote(f'{BRAND} {name} {address}')}"
+
+
+def parse_stores(page: str) -> list[dict]:
+    pattern = re.compile(
+        r'<div class="store_box">\s*'
+        r'<a href="(?P<map_url>[^"]*)"[^>]*>.*?'
+        r"<h3>(?P<name>.*?)</h3>\s*"
+        r"<p>(?P<address>.*?)</p>\s*"
+        r"<ul>\s*<li>(?P<phone>.*?)</li>\s*"
+        r"<li>(?P<hours>.*?)</li>",
+        re.S,
     )
-    seen: set[str] = set()
-    links: list[dict[str, str]] = []
-    for href, cid, title in matches:
-        if cid in seen:
+    stores: list[dict] = []
+    seen: set[tuple[str, str]] = set()
+    for index, match in enumerate(pattern.finditer(page), start=1):
+        name = clean_text(match.group("name")).replace("❄️", "").strip()
+        address = clean_text(match.group("address"))
+        phone = clean_text(match.group("phone"))
+        hours = clean_text(match.group("hours"))
+        official_map_url = html.unescape(match.group("map_url")).strip()
+        if not name or not address:
             continue
-        seen.add(cid)
-        links.append(
-            {
-                "city_group": html.unescape(title),
-                "cid": cid,
-                "url": html.unescape(href),
-            }
-        )
-    return links
-
-
-def page_urls_for_city(city: dict[str, str]) -> list[str]:
-    first = fetch(city["url"])
-    pages = {1}
-    for page in re.findall(r"currentpage=(\d+)", first):
-        pages.add(int(page))
-    urls = []
-    for page in sorted(pages):
-        suffix = "" if page == 1 else f"&currentpage={page}"
-        urls.append(f'{city["url"]}{suffix}')
-    return urls
-
-
-def parse_store_items(page: str, city: dict[str, str], source_url: str) -> list[dict[str, str]]:
-    chunks = re.split(r'<div class="row item">', page)[1:]
-    stores: list[dict[str, str]] = []
-    for chunk in chunks:
-        title_match = re.search(
-            r'edcontent_d\.php\?lang=tw(?:&amp;|&)tb=3(?:&amp;|&)id=(?P<id>\d+)"\s+[^>]*title="(?P<title>[^"]+)"',
-            chunk,
-        )
-        if not title_match:
+        key = (name, address)
+        if key in seen:
             continue
-        store_id = title_match.group("id")
-        name = html.unescape(title_match.group("title")).strip()
-        detail_url = urljoin(BASE_URL, f"edcontent_d.php?lang=tw&tb=3&id={store_id}")
-
-        summary = strip_tags(chunk)
-
-        address = normalize_field(summary, "門市地址")
-        phone = normalize_field(summary, "門市電話")
-        hours = normalize_field(summary, "營業時間")
-        query = f"茶聚CHAGE{name} {address}".strip()
-        maps_url = f"https://www.google.com/maps/search/?api=1&query={quote(query)}"
-
+        seen.add(key)
+        county, district = parse_location(address)
+        gmb_url = official_map_url if official_map_url else maps_search_url(name, address)
         stores.append(
             {
-                "official_id": store_id,
-                "official_name": name,
-                "city_group": city["city_group"],
+                "brand": BRAND,
+                "storeName": name,
+                "county": county,
+                "district": district,
                 "address": address,
                 "phone": phone,
                 "hours": hours,
-                "official_url": detail_url,
-                "source_list_url": source_url,
-                "gmb_name": "",
-                "gmb_url": maps_url,
-                "gmb_status": "待查核",
-                "has_takeout_order": None,
-                "has_delivery_order": None,
-                "takeout_providers": [],
-                "delivery_providers": [],
-                "other_providers": [],
-                "verification_note": "已建立 Google Maps 查詢連結；尚未逐店確認 GMB 點餐彈窗。",
-                "verified_at": "",
+                "officialSourceUrl": OFFICIAL_STORE_LIST_URL,
+                "officialPlannedSourceUrl": PLANNED_SOURCE_URL,
+                "officialMapUrl": official_map_url,
+                "gmbUrl": gmb_url,
+                "gmbStatus": "confirmed" if official_map_url else "needs_manual_review",
+                "takeoutAvailable": None,
+                "deliveryAvailable": None,
+                "takeoutProviders": [],
+                "deliveryProviders": [],
+                "otherProviders": [],
+                "evidenceNotes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+                "checkedAt": CHECKED_AT,
+                "sourceIndex": index,
             }
         )
     return stores
@@ -133,82 +158,124 @@ def parse_store_items(page: str, city: dict[str, str], source_url: str) -> list[
 
 def apply_manual_verifications(stores: list[dict]) -> None:
     for store in stores:
-        if "永康中華" not in store["official_name"]:
-            continue
-        store.update(
-            {
-                "gmb_name": "茶聚CHAGE永康中華店",
-                "gmb_status": "已人工確認",
-                "has_takeout_order": True,
-                "has_delivery_order": True,
-                "takeout_providers": ["foodpanda", "lin.ee"],
-                "delivery_providers": ["foodpanda", "lin.ee", "Uber Eats"],
-                "other_providers": ["lin.ee"],
-                "verification_note": "依使用者提供的 Google 商家檔案截圖人工標註：外帶含 foodpanda、lin.ee；外送含 foodpanda、lin.ee、Uber Eats。",
-                "verified_at": date.today().isoformat(),
-            }
-        )
+        normalized_name = store["storeName"].replace("臺", "台")
+        normalized_address = store["address"].replace("臺", "台")
+        if "台南中華店" in normalized_name or "中華二路195號" in normalized_address:
+            store.update(
+                {
+                    "gmbStatus": "confirmed",
+                    "takeoutAvailable": True,
+                    "deliveryAvailable": True,
+                    "takeoutProviders": ["foodpanda", "Uber Eats"],
+                    "deliveryProviders": ["foodpanda", "Uber Eats"],
+                    "otherProviders": ["lin.ee"],
+                    "evidenceNotes": "使用者提供的永康中華店 GMB 畫面驗證：可記錄 foodpanda、Uber Eats、lin.ee。",
+                }
+            )
+
+
+def make_summary(stores: list[dict]) -> dict:
+    provider_counts: Counter[str] = Counter()
+    for store in stores:
+        providers = set(store["takeoutProviders"]) | set(store["deliveryProviders"]) | set(store["otherProviders"])
+        for provider in providers:
+            provider_counts[provider] += 1
+    return {
+        "generatedAt": CHECKED_AT,
+        "officialStoreCount": len(stores),
+        "gmbFoundCount": sum(1 for store in stores if store["gmbStatus"] == "confirmed"),
+        "takeoutCount": sum(1 for store in stores if store["takeoutAvailable"] is True),
+        "deliveryCount": sum(1 for store in stores if store["deliveryAvailable"] is True),
+        "unknownCount": sum(
+            1
+            for store in stores
+            if store["takeoutAvailable"] is None or store["deliveryAvailable"] is None or store["gmbStatus"] != "confirmed"
+        ),
+        "providerCounts": dict(sorted(provider_counts.items())),
+        "gmbStatusCounts": dict(Counter(store["gmbStatus"] for store in stores)),
+        "source": {
+            "officialStoreList": OFFICIAL_STORE_LIST_URL,
+            "plannedSourceFromRequest": PLANNED_SOURCE_URL,
+            "notes": "uID=22 is the search page. uID=1 is the official Taiwan listing page that renders store cards.",
+        },
+    }
+
+
+def make_audit_samples(stores: list[dict]) -> list[dict]:
+    samples: list[dict] = []
+    seen_counties: set[str] = set()
+
+    preferred = ["臺北市", "新北市", "桃園市", "新竹市", "臺中市", "彰化縣", "嘉義市", "臺南市", "高雄市", "屏東縣"]
+    for county in preferred:
+        for store in stores:
+            if store["county"] == county and county not in seen_counties:
+                samples.append(
+                    {
+                        "storeName": store["storeName"],
+                        "county": store["county"],
+                        "address": store["address"],
+                        "officialMapUrl": store["officialMapUrl"],
+                        "gmbUrl": store["gmbUrl"],
+                        "checkResult": "official_store_and_map_link_captured",
+                        "notes": store["evidenceNotes"],
+                        "checkedAt": CHECKED_AT,
+                    }
+                )
+                seen_counties.add(county)
+                break
+        if len(samples) >= 10:
+            break
+    return samples
 
 
 def write_outputs(stores: list[dict]) -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
+    summary = make_summary(stores)
     payload = {
-        "generated_at": date.today().isoformat(),
-        "source": {
-            "official_store_list": START_URL,
-            "notes": "GMB statuses marked 待查核 were not counted as confirmed order-service usage.",
-        },
+        "generatedAt": CHECKED_AT,
+        "brand": BRAND,
+        "source": summary["source"],
         "stores": stores,
     }
     (OUT_DIR / "stores.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    (OUT_DIR / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+    (OUT_DIR / "audit-samples.json").write_text(json.dumps(make_audit_samples(stores), ensure_ascii=False, indent=2), encoding="utf-8")
 
     fields = [
-        "official_id",
-        "official_name",
-        "city_group",
+        "brand",
+        "storeName",
+        "county",
+        "district",
         "address",
         "phone",
         "hours",
-        "official_url",
-        "gmb_name",
-        "gmb_url",
-        "gmb_status",
-        "has_takeout_order",
-        "has_delivery_order",
-        "takeout_providers",
-        "delivery_providers",
-        "other_providers",
-        "verification_note",
-        "verified_at",
+        "officialSourceUrl",
+        "gmbUrl",
+        "gmbStatus",
+        "takeoutAvailable",
+        "deliveryAvailable",
+        "takeoutProviders",
+        "deliveryProviders",
+        "otherProviders",
+        "evidenceNotes",
+        "checkedAt",
     ]
     with (OUT_DIR / "stores.csv").open("w", encoding="utf-8-sig", newline="") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fields)
         writer.writeheader()
         for store in stores:
             row = dict(store)
-            for key in ("takeout_providers", "delivery_providers", "other_providers"):
+            for key in ("takeoutProviders", "deliveryProviders", "otherProviders"):
                 row[key] = "、".join(row[key])
             writer.writerow({field: row.get(field, "") for field in fields})
 
 
 def main() -> None:
-    city_links = get_city_links()
-    all_stores: list[dict] = []
-    seen_ids: set[str] = set()
-    for city in city_links:
-        for url in page_urls_for_city(city):
-            page = fetch(url)
-            for store in parse_store_items(page, city, url):
-                if store["official_id"] in seen_ids:
-                    continue
-                seen_ids.add(store["official_id"])
-                all_stores.append(store)
-            time.sleep(0.2)
-
-    all_stores.sort(key=lambda item: (item["city_group"], item["official_name"], item["official_id"]))
-    apply_manual_verifications(all_stores)
-    write_outputs(all_stores)
-    print(f"Wrote {len(all_stores)} stores to {OUT_DIR / 'stores.json'}")
+    stores = parse_stores(fetch(OFFICIAL_STORE_LIST_URL))
+    stores.sort(key=lambda item: (item["county"], item["district"], item["storeName"], item["address"]))
+    apply_manual_verifications(stores)
+    write_outputs(stores)
+    print(f"Wrote {len(stores)} Milksha stores")
 
 
 if __name__ == "__main__":

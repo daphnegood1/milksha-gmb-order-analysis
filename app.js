@@ -1,78 +1,83 @@
 const state = {
   stores: [],
   filtered: [],
+  sortKey: "county",
+  sortDirection: "asc",
+};
+
+const statusLabels = {
+  confirmed: "已取得 GMB",
+  no_gmb_found: "找不到 GMB",
+  closed_or_moved: "歇業 / 搬遷",
+  unavailable_or_blocked: "無法讀取",
+  needs_manual_review: "待人工查核",
 };
 
 const providerColors = {
-  foodpanda: "var(--rose)",
+  foodpanda: "var(--pink)",
   "Uber Eats": "var(--green)",
   "lin.ee": "var(--blue)",
+  其他: "var(--amber)",
 };
-
-function boolLabel(value) {
-  if (value === true) return "有";
-  if (value === false) return "無";
-  return "待查核";
-}
-
-function tagClass(value) {
-  if (value === true) return "confirmed";
-  if (value === false) return "none";
-  return "pending";
-}
-
-function providersText(providers) {
-  return Array.isArray(providers) && providers.length ? providers.join("、") : "無";
-}
 
 function unique(values) {
   return [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b, "zh-Hant"));
 }
 
-function confirmedStores() {
-  return state.stores.filter((store) => store.gmb_status === "已人工確認");
+function boolLabel(value) {
+  if (value === true) return "有";
+  if (value === false) return "無";
+  return "未確認";
+}
+
+function boolClass(value) {
+  if (value === true) return "confirmed";
+  if (value === false) return "none";
+  return "pending";
+}
+
+function providersText(values) {
+  return Array.isArray(values) && values.length ? values.join("、") : "未確認";
+}
+
+function renderMetric(id, value) {
+  document.getElementById(id).textContent = Number(value || 0).toLocaleString("zh-Hant");
 }
 
 function calculateStats() {
-  const confirmed = confirmedStores();
   const providerCounts = new Map();
-
-  for (const store of confirmed) {
-    const providers = unique([...(store.takeout_providers || []), ...(store.delivery_providers || [])]);
+  for (const store of state.stores) {
+    const providers = unique([...(store.takeoutProviders || []), ...(store.deliveryProviders || []), ...(store.otherProviders || [])]);
     for (const provider of providers) {
       providerCounts.set(provider, (providerCounts.get(provider) || 0) + 1);
     }
   }
 
   return {
-    total: state.stores.length,
-    confirmed: confirmed.length,
-    pending: state.stores.filter((store) => store.gmb_status !== "已人工確認").length,
-    takeout: confirmed.filter((store) => store.has_takeout_order === true).length,
-    delivery: confirmed.filter((store) => store.has_delivery_order === true).length,
+    officialStoreCount: state.stores.length,
+    gmbFoundCount: state.stores.filter((store) => store.gmbStatus === "confirmed").length,
+    takeoutCount: state.stores.filter((store) => store.takeoutAvailable === true).length,
+    deliveryCount: state.stores.filter((store) => store.deliveryAvailable === true).length,
+    unknownCount: state.stores.filter((store) => store.takeoutAvailable == null || store.deliveryAvailable == null).length,
     providerCounts,
   };
 }
 
-function renderMetric(id, value) {
-  document.getElementById(id).textContent = value.toLocaleString("zh-Hant");
-}
-
 function renderBarChart(node, rows, maxValue) {
   node.innerHTML = "";
-  if (!rows.length) {
-    node.innerHTML = '<p class="small">尚無已確認資料</p>';
+  if (!rows.length || maxValue === 0) {
+    node.innerHTML = '<p class="small">目前沒有已確認資料</p>';
     return;
   }
 
   for (const row of rows) {
-    const width = maxValue > 0 ? Math.max(2, (row.value / maxValue) * 100) : 0;
+    const width = Math.max(3, (row.value / maxValue) * 100);
     const element = document.createElement("div");
     element.className = "bar-row";
     element.innerHTML = `
       <span class="bar-label">${row.label}</span>
-      <span class="bar-track"><span class="bar-fill" style="width:${width}%; background:${row.color || "var(--green)"}"></span></span>
-      <span class="bar-value">${row.value}</span>
+      <span class="bar-track"><span class="bar-fill" style="width:${width}%; background:${row.color}"></span></span>
+      <span class="bar-value">${row.value.toLocaleString("zh-Hant")}</span>
     `;
     node.appendChild(element);
   }
@@ -80,68 +85,81 @@ function renderBarChart(node, rows, maxValue) {
 
 function renderCharts() {
   const stats = calculateStats();
-  renderMetric("totalStores", stats.total);
-  renderMetric("confirmedStores", stats.confirmed);
-  renderMetric("takeoutStores", stats.takeout);
-  renderMetric("deliveryStores", stats.delivery);
-  renderMetric("pendingStores", stats.pending);
+  renderMetric("officialStoreCount", stats.officialStoreCount);
+  renderMetric("gmbFoundCount", stats.gmbFoundCount);
+  renderMetric("takeoutCount", stats.takeoutCount);
+  renderMetric("deliveryCount", stats.deliveryCount);
+  renderMetric("unknownCount", stats.unknownCount);
 
   renderBarChart(
     document.getElementById("orderChart"),
     [
-      { label: "點餐外帶", value: stats.takeout, color: "var(--blue)" },
-      { label: "點餐外送", value: stats.delivery, color: "var(--green)" },
-      { label: "待查核", value: stats.pending, color: "var(--amber)" },
+      { label: "外帶", value: stats.takeoutCount, color: "var(--blue)" },
+      { label: "外送", value: stats.deliveryCount, color: "var(--green)" },
+      { label: "未確認", value: stats.unknownCount, color: "var(--amber)" },
     ],
-    Math.max(stats.takeout, stats.delivery, stats.pending)
+    Math.max(stats.takeoutCount, stats.deliveryCount, stats.unknownCount)
   );
 
   const providers = [...stats.providerCounts.entries()]
-    .map(([label, value]) => ({ label, value, color: providerColors[label] || "var(--amber)" }))
+    .map(([label, value]) => ({ label, value, color: providerColors[label] || providerColors["其他"] }))
     .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label, "zh-Hant"));
   renderBarChart(document.getElementById("providerChart"), providers, Math.max(...providers.map((row) => row.value), 0));
 }
 
 function fillFilters() {
-  const cityFilter = document.getElementById("cityFilter");
+  const countyFilter = document.getElementById("countyFilter");
   const statusFilter = document.getElementById("statusFilter");
-
-  for (const city of unique(state.stores.map((store) => store.city_group))) {
+  for (const county of unique(state.stores.map((store) => store.county))) {
     const option = document.createElement("option");
-    option.value = city;
-    option.textContent = city;
-    cityFilter.appendChild(option);
+    option.value = county;
+    option.textContent = county;
+    countyFilter.appendChild(option);
   }
-
-  for (const status of unique(state.stores.map((store) => store.gmb_status))) {
+  for (const status of unique(state.stores.map((store) => store.gmbStatus))) {
     const option = document.createElement("option");
     option.value = status;
-    option.textContent = status;
+    option.textContent = statusLabels[status] || status;
     statusFilter.appendChild(option);
   }
 }
 
 function matchesFilters(store) {
   const query = document.getElementById("searchInput").value.trim().toLowerCase();
-  const city = document.getElementById("cityFilter").value;
+  const county = document.getElementById("countyFilter").value;
   const status = document.getElementById("statusFilter").value;
+  const service = document.getElementById("serviceFilter").value;
   const haystack = [
-    store.official_name,
-    store.gmb_name,
-    store.city_group,
+    store.storeName,
+    store.county,
+    store.district,
     store.address,
-    ...(store.takeout_providers || []),
-    ...(store.delivery_providers || []),
-    ...(store.other_providers || []),
-    store.verification_note,
+    store.phone,
+    ...(store.takeoutProviders || []),
+    ...(store.deliveryProviders || []),
+    ...(store.otherProviders || []),
+    store.evidenceNotes,
   ]
     .join(" ")
     .toLowerCase();
 
-  return (!query || haystack.includes(query)) && (!city || store.city_group === city) && (!status || store.gmb_status === status);
+  if (query && !haystack.includes(query)) return false;
+  if (county && store.county !== county) return false;
+  if (status && store.gmbStatus !== status) return false;
+  if (service === "takeout" && store.takeoutAvailable !== true) return false;
+  if (service === "delivery" && store.deliveryAvailable !== true) return false;
+  if (service === "unknown" && store.takeoutAvailable !== null && store.deliveryAvailable !== null) return false;
+  return true;
 }
 
-function renderTags(values, fallback = "無") {
+function sortStores(a, b) {
+  const left = String(a[state.sortKey] || "");
+  const right = String(b[state.sortKey] || "");
+  const result = left.localeCompare(right, "zh-Hant");
+  return state.sortDirection === "asc" ? result : -result;
+}
+
+function renderTags(values, fallback = "未確認") {
   if (!Array.isArray(values) || !values.length) {
     return `<span class="small">${fallback}</span>`;
   }
@@ -149,8 +167,8 @@ function renderTags(values, fallback = "無") {
 }
 
 function renderRows() {
-  state.filtered = state.stores.filter(matchesFilters);
-  document.getElementById("rowCount").textContent = `${state.filtered.length.toLocaleString("zh-Hant")} 筆資料`;
+  state.filtered = state.stores.filter(matchesFilters).sort(sortStores);
+  document.getElementById("rowCount").textContent = `${state.filtered.length.toLocaleString("zh-Hant")} 筆`;
   const body = document.getElementById("storeRows");
   body.innerHTML = "";
 
@@ -158,27 +176,29 @@ function renderRows() {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>
-        <div class="store-name">${store.official_name}</div>
-        <div class="small">${store.city_group}</div>
-      </td>
-      <td>${store.address || '<span class="small">未提供</span>'}</td>
-      <td>
-        <span class="tag ${store.gmb_status === "已人工確認" ? "confirmed" : "pending"}">${store.gmb_status}</span>
-        <div class="small">${store.verification_note || ""}</div>
+        <div class="store-name">${store.storeName}</div>
+        <div class="small">${store.phone || "無電話"}</div>
       </td>
       <td>
-        <span class="tag ${tagClass(store.has_takeout_order)}">${boolLabel(store.has_takeout_order)}</span>
-        ${renderTags(store.takeout_providers, "待查核")}
+        <div>${store.county || "未解析"}${store.district ? ` / ${store.district}` : ""}</div>
+        <div class="small">${store.address || "無地址"}</div>
       </td>
       <td>
-        <span class="tag ${tagClass(store.has_delivery_order)}">${boolLabel(store.has_delivery_order)}</span>
-        ${renderTags(store.delivery_providers, "待查核")}
+        <span class="tag ${store.gmbStatus === "confirmed" ? "confirmed" : "pending"}">${statusLabels[store.gmbStatus] || store.gmbStatus}</span>
+        <div class="small">${store.evidenceNotes || ""}</div>
       </td>
-      <td>${renderTags(store.other_providers)}</td>
       <td>
-        <a href="${store.gmb_url}" target="_blank" rel="noreferrer">GMB</a>
-        <span class="small"> / </span>
-        <a href="${store.official_url}" target="_blank" rel="noreferrer">官網</a>
+        <span class="tag ${boolClass(store.takeoutAvailable)}">${boolLabel(store.takeoutAvailable)}</span>
+        ${renderTags(store.takeoutProviders)}
+      </td>
+      <td>
+        <span class="tag ${boolClass(store.deliveryAvailable)}">${boolLabel(store.deliveryAvailable)}</span>
+        ${renderTags(store.deliveryProviders)}
+      </td>
+      <td>${renderTags(store.otherProviders, "無")}</td>
+      <td class="links">
+        <a href="${store.gmbUrl}" target="_blank" rel="noreferrer">GMB</a>
+        <a href="${store.officialSourceUrl}" target="_blank" rel="noreferrer">官方</a>
       </td>
     `;
     body.appendChild(row);
@@ -186,16 +206,28 @@ function renderRows() {
 }
 
 function bindEvents() {
-  for (const id of ["searchInput", "cityFilter", "statusFilter"]) {
+  for (const id of ["searchInput", "countyFilter", "statusFilter", "serviceFilter"]) {
     document.getElementById(id).addEventListener("input", renderRows);
   }
+  document.querySelectorAll("th[data-sort]").forEach((header) => {
+    header.addEventListener("click", () => {
+      const nextKey = header.dataset.sort;
+      if (state.sortKey === nextKey) {
+        state.sortDirection = state.sortDirection === "asc" ? "desc" : "asc";
+      } else {
+        state.sortKey = nextKey;
+        state.sortDirection = "asc";
+      }
+      renderRows();
+    });
+  });
 }
 
 async function init() {
   const response = await fetch("data/stores.json", { cache: "no-store" });
   const payload = await response.json();
   state.stores = payload.stores || [];
-  document.getElementById("updatedAt").textContent = `資料更新：${payload.generated_at || "未標示"}`;
+  document.getElementById("checkedAt").textContent = payload.generatedAt || "-";
   fillFilters();
   renderCharts();
   renderRows();

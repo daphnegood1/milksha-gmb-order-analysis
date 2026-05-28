@@ -1,0 +1,102 @@
+[
+  {
+    "storeName": "臺北中山南西店",
+    "county": "臺北市",
+    "address": "台北市中山區中山北路一段140巷13號1樓",
+    "officialMapUrl": "https://www.google.com.tw/maps/place/台北市中山區中山北路一段140巷13號1樓",
+    "gmbUrl": "https://www.google.com.tw/maps/place/台北市中山區中山北路一段140巷13號1樓",
+    "checkResult": "official_store_and_map_link_captured",
+    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "checkedAt": "2026-05-28"
+  },
+  {
+    "storeName": "新北三峽北大店",
+    "county": "新北市",
+    "address": "新北市三峽區國際二街33號1樓",
+    "officialMapUrl": "https://www.google.com.tw/maps/place/新北市三峽區國際二街33號1樓",
+    "gmbUrl": "https://www.google.com.tw/maps/place/新北市三峽區國際二街33號1樓",
+    "checkResult": "official_store_and_map_link_captured",
+    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "checkedAt": "2026-05-28"
+  },
+  {
+    "storeName": "Milksha Plus 桃園華泰一期店",
+    "county": "桃園市",
+    "address": "320016桃園市中壢區春德路189號美食街1140B一期二樓",
+    "officialMapUrl": "https://maps.app.goo.gl/RJk5evUwBCNNTFtJ6",
+    "gmbUrl": "https://maps.app.goo.gl/RJk5evUwBCNNTFtJ6",
+    "checkResult": "official_store_and_map_link_captured",
+    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "checkedAt": "2026-05-28"
+  },
+  {
+    "storeName": "新竹關新店",
+    "county": "新竹市",
+    "address": "新竹市關新二街51號",
+    "officialMapUrl": "https://www.google.com.tw/maps/place/新竹市關新二街51號",
+    "gmbUrl": "https://www.google.com.tw/maps/place/新竹市關新二街51號",
+    "checkResult": "official_store_and_map_link_captured",
+    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "checkedAt": "2026-05-28"
+  },
+  {
+    "storeName": "臺中一中店",
+    "county": "臺中市",
+    "address": "台中市北區三民路三段193-4號",
+    "officialMapUrl": "https://www.google.com.tw/maps/place/台中市北區三民路三段193-4號",
+    "gmbUrl": "https://www.google.com.tw/maps/place/台中市北區三民路三段193-4號",
+    "checkResult": "official_store_and_map_link_captured",
+    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "checkedAt": "2026-05-28"
+  },
+  {
+    "storeName": "彰化二林店",
+    "county": "彰化縣",
+    "address": "52641 彰化縣二林鎮中正路47號",
+    "officialMapUrl": "https://www.google.com.tw/maps/place/52641 彰化縣二林鎮中正路47號",
+    "gmbUrl": "https://www.google.com.tw/maps/place/52641 彰化縣二林鎮中正路47號",
+    "checkResult": "official_store_and_map_link_captured",
+    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "checkedAt": "2026-05-28"
+  },
+  {
+    "storeName": "嘉義文化店",
+    "county": "嘉義市",
+    "address": "60042 嘉義市東區中正路339號",
+    "officialMapUrl": "https://www.google.com.tw/maps/place/60042 嘉義市東區中正路339號",
+    "gmbUrl": "https://www.google.com.tw/maps/place/60042 嘉義市東區中正路339號",
+    "checkResult": "official_store_and_map_link_captured",
+    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "checkedAt": "2026-05-28"
+  },
+  {
+    "storeName": "臺南南門店",
+    "county": "臺南市",
+    "address": "70049 台南市中西區南門路179-6號",
+    "officialMapUrl": "https://www.google.com.tw/maps/place/70049 台南市中西區南門路179-6號",
+    "gmbUrl": "https://www.google.com.tw/maps/place/70049 台南市中西區南門路179-6號",
+    "checkResult": "official_store_and_map_link_captured",
+    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "checkedAt": "2026-05-28"
+  },
+  {
+    "storeName": "Milksha Plus高雄大樂店",
+    "county": "高雄市",
+    "address": "807676高雄市三民區民族一路463號1樓",
+    "officialMapUrl": "https://maps.app.goo.gl/WBSZEqFVQV4UPWoH9",
+    "gmbUrl": "https://maps.app.goo.gl/WBSZEqFVQV4UPWoH9",
+    "checkResult": "official_store_and_map_link_captured",
+    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "checkedAt": "2026-05-28"
+  },
+  {
+    "storeName": "屏東內埔店",
+    "county": "屏東縣",
+    "address": "91248屏東縣內埔鄉廣濟路128號1樓",
+    "officialMapUrl": "https://goo.gl/maps/8MQAXBrSHv7E1yWo9",
+    "gmbUrl": "https://goo.gl/maps/8MQAXBrSHv7E1yWo9",
+    "checkResult": "official_store_and_map_link_captured",
+    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "checkedAt": "2026-05-28"
+  }
+]

@@ -3,59 +3,77 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>茶聚 GMB 點餐服務統計</title>
+    <title>迷客夏 GMB 點餐服務統計</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">CHAGE GMB ORDER ANALYSIS</p>
-        <h1>茶聚 GMB 點餐服務統計</h1>
-        <p class="subtitle">
-          以茶聚官網門市為母清單，追蹤 Google 商家檔案中的點餐外帶、點餐外送與第三方服務商。
-        </p>
-      </div>
-      <div class="meta">
-        <span id="updatedAt">更新中</span>
+    <header class="hero">
+      <nav class="topbar" aria-label="主要連結">
+        <a href="https://www.milksha.com/store_detail.php?uID=1" target="_blank" rel="noreferrer">官方門市清單</a>
         <a href="data/stores.csv">下載 CSV</a>
+        <a href="data/stores.json">資料 JSON</a>
+      </nav>
+      <div class="hero-content">
+        <p class="eyebrow">Milksha GMB Order Analysis</p>
+        <h1>迷客夏 GMB 點餐服務統計</h1>
+        <p class="subtitle">
+          以迷客夏官方台灣門市清單為母體，彙整 Google 商家檔案連結、點餐外帶/外送服務商與查核狀態。
+        </p>
+        <dl class="source-meta">
+          <div>
+            <dt>查核日期</dt>
+            <dd id="checkedAt">-</dd>
+          </div>
+          <div>
+            <dt>資料來源</dt>
+            <dd>Milksha 官方門市頁</dd>
+          </div>
+        </dl>
       </div>
     </header>
 
     <main>
       <section class="metrics" aria-label="統計總覽">
         <article>
-          <span>官方門市</span>
-          <strong id="totalStores">0</strong>
+          <span>官方門市數</span>
+          <strong id="officialStoreCount">0</strong>
         </article>
         <article>
-          <span>已確認 GMB</span>
-          <strong id="confirmedStores">0</strong>
+          <span>找到 GMB</span>
+          <strong id="gmbFoundCount">0</strong>
         </article>
         <article>
-          <span>點餐外帶</span>
-          <strong id="takeoutStores">0</strong>
+          <span>外帶</span>
+          <strong id="takeoutCount">0</strong>
         </article>
         <article>
-          <span>點餐外送</span>
-          <strong id="deliveryStores">0</strong>
+          <span>外送</span>
+          <strong id="deliveryCount">0</strong>
         </article>
         <article>
-          <span>待查核</span>
-          <strong id="pendingStores">0</strong>
+          <span>未確認</span>
+          <strong id="unknownCount">0</strong>
         </article>
+      </section>
+
+      <section class="notice">
+        <h2>查核說明</h2>
+        <p>
+          官方頁已提供多數門市的 Google Maps 連結；Google 商家檔案的點餐按鈕若受自動化限制，未確認門市會保留在明細並標示待人工查核，不以猜測補值。
+        </p>
       </section>
 
       <section class="panel-grid">
         <article class="panel">
           <div class="panel-head">
-            <h2>點餐功能</h2>
-            <span>已確認門市</span>
+            <h2>外帶 / 外送</h2>
+            <span>以已確認資料計算</span>
           </div>
           <div id="orderChart" class="bar-chart"></div>
         </article>
         <article class="panel">
           <div class="panel-head">
-            <h2>服務商分布</h2>
+            <h2>服務商</h2>
             <span>門市數</span>
           </div>
           <div id="providerChart" class="bar-chart"></div>
@@ -66,15 +84,21 @@
         <div class="table-tools">
           <div>
             <h2>門市明細</h2>
-            <p id="rowCount">0 筆資料</p>
+            <p id="rowCount">0 筆</p>
           </div>
           <div class="filters">
             <input id="searchInput" type="search" placeholder="搜尋店名、地址、服務商" />
-            <select id="cityFilter" aria-label="縣市篩選">
+            <select id="countyFilter" aria-label="縣市篩選">
               <option value="">全部縣市</option>
             </select>
             <select id="statusFilter" aria-label="狀態篩選">
               <option value="">全部狀態</option>
+            </select>
+            <select id="serviceFilter" aria-label="服務篩選">
+              <option value="">全部服務</option>
+              <option value="takeout">外帶</option>
+              <option value="delivery">外送</option>
+              <option value="unknown">未確認</option>
             </select>
           </div>
         </div>
@@ -82,11 +106,11 @@
           <table>
             <thead>
               <tr>
-                <th>門市</th>
-                <th>地址</th>
+                <th data-sort="storeName">門市</th>
+                <th data-sort="county">地區</th>
                 <th>GMB 狀態</th>
-                <th>點餐外帶</th>
-                <th>點餐外送</th>
+                <th>外帶服務商</th>
+                <th>外送服務商</th>
                 <th>其他服務商</th>
                 <th>連結</th>
               </tr>
@@ -98,9 +122,7 @@
     </main>
 
     <footer>
-      <p>
-        資料來源：茶聚官網門市據點、Google 商家檔案人工查核。待查核資料不列入已確認服務商統計。
-      </p>
+      <p>本頁為公開查核資料網站。資料檔保留於專案內，方便未來重新抓取與補查。</p>
     </footer>
 
     <script src="app.js"></script>

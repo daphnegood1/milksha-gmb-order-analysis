@@ -1,25 +1,41 @@
-# 茶聚 GMB 點餐服務統計
+# 迷客夏 GMB 點餐服務統計
 
-這個專案用來整理台灣茶聚 CHAGE 門市的 Google 商家檔案點餐服務資訊，並發布成 GitHub Pages 靜態網站。
+這是一個 GitHub Pages 靜態網站，用來整理迷客夏台灣門市的 Google 商家檔案連結、點餐外帶 / 外送服務商與查核狀態。
 
-## 目前資料狀態
+## 資料來源
 
-- 官方門市清單來自茶聚官網「門市據點」。
-- GMB 欄位先建立 Google Maps 查詢連結與查核狀態。
-- 使用者提供的「茶聚CHAGE永康中華店」已依截圖人工標註 foodpanda、Uber Eats、lin.ee。
-- 其他門市若尚未能透過瀏覽器逐店確認，會標示為「待查核」，不列入已確認服務商統計。
+- 官方台灣門市列表：<https://www.milksha.com/store_detail.php?uID=1>
+- 原需求指定入口：<https://www.milksha.com/en/store_detail.php?uID=22>
+
+`uID=22` 是查詢介面；`uID=1` 是官方頁面中實際渲染台灣門市卡片的來源。
 
 ## 更新資料
 
 ```powershell
-& "C:\Users\User\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" tools\fetch_official_stores.py
+python tools\fetch_official_stores.py
 ```
 
-產出：
+輸出：
 
 - `data/stores.json`
+- `data/summary.json`
+- `data/audit-samples.json`
 - `data/stores.csv`
 
-## GitHub Pages
+## 查核狀態
 
-本專案是純靜態網站，GitHub Pages 可直接使用 `main` branch root 目錄發布。
+- `confirmed`: 已取得官方頁提供的 Google Maps / GMB 連結。
+- `no_gmb_found`: 找不到 Google 商家檔案。
+- `closed_or_moved`: 歇業或搬遷。
+- `unavailable_or_blocked`: Google 限制或頁面無法讀取。
+- `needs_manual_review`: 需要人工開啟商家檔案確認。
+
+Google 商家檔案的點餐按鈕若受自動化限制，資料不猜測，會保留為未確認。
+
+## 本機預覽
+
+```powershell
+python -m http.server 4173
+```
+
+開啟 <http://localhost:4173>。

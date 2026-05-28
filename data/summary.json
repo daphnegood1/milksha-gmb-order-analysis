@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-05-28",
+  "officialStoreCount": 335,
+  "gmbFoundCount": 335,
+  "takeoutCount": 1,
+  "deliveryCount": 1,
+  "unknownCount": 334,
+  "providerCounts": {
+    "Uber Eats": 1,
+    "foodpanda": 1,
+    "lin.ee": 1
+  },
+  "gmbStatusCounts": {
+    "confirmed": 335
+  },
+  "source": {
+    "officialStoreList": "https://www.milksha.com/store_detail.php?uID=1",
+    "plannedSourceFromRequest": "https://www.milksha.com/en/store_detail.php?uID=22",
+    "notes": "uID=22 is the search page. uID=1 is the official Taiwan listing page that renders store cards."
+  }
+}
