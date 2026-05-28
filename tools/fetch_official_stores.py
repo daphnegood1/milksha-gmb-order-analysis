@@ -176,7 +176,16 @@ def apply_manual_verifications(stores: list[dict]) -> None:
 
 def make_summary(stores: list[dict]) -> dict:
     provider_counts: Counter[str] = Counter()
+    takeout_provider_counts: Counter[str] = Counter()
+    delivery_provider_counts: Counter[str] = Counter()
+    other_provider_counts: Counter[str] = Counter()
     for store in stores:
+        for provider in set(store["takeoutProviders"]):
+            takeout_provider_counts[provider] += 1
+        for provider in set(store["deliveryProviders"]):
+            delivery_provider_counts[provider] += 1
+        for provider in set(store["otherProviders"]):
+            other_provider_counts[provider] += 1
         providers = set(store["takeoutProviders"]) | set(store["deliveryProviders"]) | set(store["otherProviders"])
         for provider in providers:
             provider_counts[provider] += 1
@@ -192,6 +201,9 @@ def make_summary(stores: list[dict]) -> dict:
             if store["takeoutAvailable"] is None or store["deliveryAvailable"] is None or store["gmbStatus"] != "confirmed"
         ),
         "providerCounts": dict(sorted(provider_counts.items())),
+        "takeoutProviderCounts": dict(sorted(takeout_provider_counts.items())),
+        "deliveryProviderCounts": dict(sorted(delivery_provider_counts.items())),
+        "otherProviderCounts": dict(sorted(other_provider_counts.items())),
         "gmbStatusCounts": dict(Counter(store["gmbStatus"] for store in stores)),
         "source": {
             "officialStoreList": OFFICIAL_STORE_LIST_URL,

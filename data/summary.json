@@ -11,6 +11,19 @@
     "foodpanda": 135,
     "lin.ee": 2
   },
+  "takeoutProviderCounts": {
+    "Nidin": 315,
+    "Uber Eats": 1,
+    "foodpanda": 1
+  },
+  "deliveryProviderCounts": {
+    "Nidin": 302,
+    "Uber Eats": 118,
+    "foodpanda": 135
+  },
+  "otherProviderCounts": {
+    "lin.ee": 2
+  },
   "gmbStatusCounts": {
     "confirmed": 335
   },

@@ -46,11 +46,14 @@ function renderMetric(id, value) {
 }
 
 function calculateStats() {
-  const providerCounts = new Map();
+  const takeoutProviderCounts = new Map();
+  const deliveryProviderCounts = new Map();
   for (const store of state.stores) {
-    const providers = unique([...(store.takeoutProviders || []), ...(store.deliveryProviders || []), ...(store.otherProviders || [])]);
-    for (const provider of providers) {
-      providerCounts.set(provider, (providerCounts.get(provider) || 0) + 1);
+    for (const provider of unique(store.takeoutProviders || [])) {
+      takeoutProviderCounts.set(provider, (takeoutProviderCounts.get(provider) || 0) + 1);
+    }
+    for (const provider of unique(store.deliveryProviders || [])) {
+      deliveryProviderCounts.set(provider, (deliveryProviderCounts.get(provider) || 0) + 1);
     }
   }
 
@@ -60,7 +63,8 @@ function calculateStats() {
     takeoutCount: state.stores.filter((store) => store.takeoutAvailable === true).length,
     deliveryCount: state.stores.filter((store) => store.deliveryAvailable === true).length,
     unknownCount: state.stores.filter((store) => store.takeoutAvailable == null || store.deliveryAvailable == null).length,
-    providerCounts,
+    takeoutProviderCounts,
+    deliveryProviderCounts,
   };
 }
 
@@ -102,10 +106,23 @@ function renderCharts() {
     Math.max(stats.takeoutCount, stats.deliveryCount, stats.unknownCount)
   );
 
-  const providers = [...stats.providerCounts.entries()]
+  const takeoutProviders = [...stats.takeoutProviderCounts.entries()]
     .map(([label, value]) => ({ label, value, color: providerColors[label] || providerColors["其他"] }))
     .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label, "zh-Hant"));
-  renderBarChart(document.getElementById("providerChart"), providers, Math.max(...providers.map((row) => row.value), 0));
+  renderBarChart(
+    document.getElementById("takeoutProviderChart"),
+    takeoutProviders,
+    Math.max(...takeoutProviders.map((row) => row.value), 0)
+  );
+
+  const deliveryProviders = [...stats.deliveryProviderCounts.entries()]
+    .map(([label, value]) => ({ label, value, color: providerColors[label] || providerColors["其他"] }))
+    .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label, "zh-Hant"));
+  renderBarChart(
+    document.getElementById("deliveryProviderChart"),
+    deliveryProviders,
+    Math.max(...deliveryProviders.map((row) => row.value), 0)
+  );
 }
 
 function fillFilters() {
