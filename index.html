@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>茶聚 GMB 點餐服務統計</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">CHAGE GMB ORDER ANALYSIS</p>
+        <h1>茶聚 GMB 點餐服務統計</h1>
+        <p class="subtitle">
+          以茶聚官網門市為母清單，追蹤 Google 商家檔案中的點餐外帶、點餐外送與第三方服務商。
+        </p>
+      </div>
+      <div class="meta">
+        <span id="updatedAt">更新中</span>
+        <a href="data/stores.csv">下載 CSV</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="metrics" aria-label="統計總覽">
+        <article>
+          <span>官方門市</span>
+          <strong id="totalStores">0</strong>
+        </article>
+        <article>
+          <span>已確認 GMB</span>
+          <strong id="confirmedStores">0</strong>
+        </article>
+        <article>
+          <span>點餐外帶</span>
+          <strong id="takeoutStores">0</strong>
+        </article>
+        <article>
+          <span>點餐外送</span>
+          <strong id="deliveryStores">0</strong>
+        </article>
+        <article>
+          <span>待查核</span>
+          <strong id="pendingStores">0</strong>
+        </article>
+      </section>
+
+      <section class="panel-grid">
+        <article class="panel">
+          <div class="panel-head">
+            <h2>點餐功能</h2>
+            <span>已確認門市</span>
+          </div>
+          <div id="orderChart" class="bar-chart"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head">
+            <h2>服務商分布</h2>
+            <span>門市數</span>
+          </div>
+          <div id="providerChart" class="bar-chart"></div>
+        </article>
+      </section>
+
+      <section class="table-panel">
+        <div class="table-tools">
+          <div>
+            <h2>門市明細</h2>
+            <p id="rowCount">0 筆資料</p>
+          </div>
+          <div class="filters">
+            <input id="searchInput" type="search" placeholder="搜尋店名、地址、服務商" />
+            <select id="cityFilter" aria-label="縣市篩選">
+              <option value="">全部縣市</option>
+            </select>
+            <select id="statusFilter" aria-label="狀態篩選">
+              <option value="">全部狀態</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>門市</th>
+                <th>地址</th>
+                <th>GMB 狀態</th>
+                <th>點餐外帶</th>
+                <th>點餐外送</th>
+                <th>其他服務商</th>
+                <th>連結</th>
+              </tr>
+            </thead>
+            <tbody id="storeRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        資料來源：茶聚官網門市據點、Google 商家檔案人工查核。待查核資料不列入已確認服務商統計。
+      </p>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
