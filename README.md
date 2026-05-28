@@ -13,6 +13,8 @@
 
 ```powershell
 python tools\fetch_official_stores.py
+python tools\audit_order_providers.py --workers 10
+python tools\audit_nidin_order.py
 ```
 
 輸出：
@@ -31,6 +33,14 @@ python tools\fetch_official_stores.py
 - `needs_manual_review`: 需要人工開啟商家檔案確認。
 
 Google 商家檔案的點餐按鈕若受自動化限制，資料不猜測，會保留為未確認。
+
+## 查核來源
+
+- 迷客夏官方門市頁：門市母體與 Google Maps 連結。
+- 迷客夏官方 Nidin 點餐 API：確認官方線上點餐、自取外帶與 Nidin 外送條件。
+- Footinder 店家頁：交叉比對 foodpanda、Uber Eats、lin.ee 等外送供應商。
+
+若 Nidin 與 Footinder 都沒有足夠資料，該門市仍標為需人工確認。
 
 ## 本機預覽
 

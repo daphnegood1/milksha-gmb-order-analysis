@@ -6,7 +6,7 @@
     "officialMapUrl": "https://www.google.com.tw/maps/place/台北市中山區中山北路一段140巷13號1樓",
     "gmbUrl": "https://www.google.com.tw/maps/place/台北市中山區中山北路一段140巷13號1樓",
     "checkResult": "official_store_and_map_link_captured",
-    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "notes": "外送服務商依 Footinder 店家頁交叉比對：foodpanda, Uber Eats。外帶服務商需人工開啟 Google 商家檔案點餐按鈕確認。 官方 Nidin 點餐 API 確認此店可線上點餐；門市 ID 11251，外送條件：最低滿250外送。",
     "checkedAt": "2026-05-28"
   },
   {
@@ -16,7 +16,7 @@
     "officialMapUrl": "https://www.google.com.tw/maps/place/新北市三峽區國際二街33號1樓",
     "gmbUrl": "https://www.google.com.tw/maps/place/新北市三峽區國際二街33號1樓",
     "checkResult": "official_store_and_map_link_captured",
-    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "notes": "未找到可比對的 Footinder 店家頁；需人工開啟 GMB 點餐按鈕確認外帶/外送服務商。 官方 Nidin 點餐 API 確認此店可線上點餐；門市 ID 16759，外送條件：最低滿200外送。",
     "checkedAt": "2026-05-28"
   },
   {
@@ -26,7 +26,7 @@
     "officialMapUrl": "https://maps.app.goo.gl/RJk5evUwBCNNTFtJ6",
     "gmbUrl": "https://maps.app.goo.gl/RJk5evUwBCNNTFtJ6",
     "checkResult": "official_store_and_map_link_captured",
-    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "notes": "未找到可比對的 Footinder 店家頁；需人工開啟 GMB 點餐按鈕確認外帶/外送服務商。",
     "checkedAt": "2026-05-28"
   },
   {
@@ -36,7 +36,7 @@
     "officialMapUrl": "https://www.google.com.tw/maps/place/新竹市關新二街51號",
     "gmbUrl": "https://www.google.com.tw/maps/place/新竹市關新二街51號",
     "checkResult": "official_store_and_map_link_captured",
-    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "notes": "外送服務商依 Footinder 店家頁交叉比對：foodpanda, Uber Eats。外帶服務商需人工開啟 Google 商家檔案點餐按鈕確認。 官方 Nidin 點餐 API 確認此店可線上點餐；門市 ID 9754，外送條件：最低滿0外送。",
     "checkedAt": "2026-05-28"
   },
   {
@@ -46,7 +46,7 @@
     "officialMapUrl": "https://www.google.com.tw/maps/place/台中市北區三民路三段193-4號",
     "gmbUrl": "https://www.google.com.tw/maps/place/台中市北區三民路三段193-4號",
     "checkResult": "official_store_and_map_link_captured",
-    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "notes": "外送服務商依 Footinder 店家頁交叉比對：foodpanda, Uber Eats。外帶服務商需人工開啟 Google 商家檔案點餐按鈕確認。 官方 Nidin 點餐 API 確認此店可線上點餐；門市 ID 11176，外送條件：最低滿0外送。",
     "checkedAt": "2026-05-28"
   },
   {
@@ -56,7 +56,7 @@
     "officialMapUrl": "https://www.google.com.tw/maps/place/52641 彰化縣二林鎮中正路47號",
     "gmbUrl": "https://www.google.com.tw/maps/place/52641 彰化縣二林鎮中正路47號",
     "checkResult": "official_store_and_map_link_captured",
-    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "notes": "外送服務商依 Footinder 店家頁交叉比對：foodpanda, Uber Eats。外帶服務商需人工開啟 Google 商家檔案點餐按鈕確認。 官方 Nidin 點餐 API 確認此店可線上點餐；門市 ID 334，外送條件：最低滿25外送。",
     "checkedAt": "2026-05-28"
   },
   {
@@ -66,7 +66,7 @@
     "officialMapUrl": "https://www.google.com.tw/maps/place/60042 嘉義市東區中正路339號",
     "gmbUrl": "https://www.google.com.tw/maps/place/60042 嘉義市東區中正路339號",
     "checkResult": "official_store_and_map_link_captured",
-    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "notes": "外送服務商依 Footinder 店家頁交叉比對：foodpanda, Uber Eats。外帶服務商需人工開啟 Google 商家檔案點餐按鈕確認。 官方 Nidin 點餐 API 確認此店可線上點餐；門市 ID 15448，外送條件：最低滿100外送。",
     "checkedAt": "2026-05-28"
   },
   {
@@ -76,7 +76,7 @@
     "officialMapUrl": "https://www.google.com.tw/maps/place/70049 台南市中西區南門路179-6號",
     "gmbUrl": "https://www.google.com.tw/maps/place/70049 台南市中西區南門路179-6號",
     "checkResult": "official_store_and_map_link_captured",
-    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "notes": "未找到可比對的 Footinder 店家頁；需人工開啟 GMB 點餐按鈕確認外帶/外送服務商。 官方 Nidin 點餐 API 確認此店可線上點餐；門市 ID 20424，外送條件：最低滿40外送。",
     "checkedAt": "2026-05-28"
   },
   {
@@ -86,7 +86,7 @@
     "officialMapUrl": "https://maps.app.goo.gl/WBSZEqFVQV4UPWoH9",
     "gmbUrl": "https://maps.app.goo.gl/WBSZEqFVQV4UPWoH9",
     "checkResult": "official_store_and_map_link_captured",
-    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "notes": "未找到可比對的 Footinder 店家頁；需人工開啟 GMB 點餐按鈕確認外帶/外送服務商。",
     "checkedAt": "2026-05-28"
   },
   {
@@ -96,7 +96,7 @@
     "officialMapUrl": "https://goo.gl/maps/8MQAXBrSHv7E1yWo9",
     "gmbUrl": "https://goo.gl/maps/8MQAXBrSHv7E1yWo9",
     "checkResult": "official_store_and_map_link_captured",
-    "notes": "官方門市頁提供 Google Maps 連結；GMB 點餐外帶/外送服務商仍需逐店人工開啟商家檔案確認。",
+    "notes": "外送服務商依 Footinder 店家頁交叉比對：foodpanda, Uber Eats。外帶服務商需人工開啟 Google 商家檔案點餐按鈕確認。 官方 Nidin 點餐 API 確認此店可線上點餐；門市 ID 14134，外送條件：最低滿100外送。",
     "checkedAt": "2026-05-28"
   }
 ]

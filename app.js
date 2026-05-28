@@ -14,8 +14,9 @@ const statusLabels = {
 };
 
 const providerColors = {
+  Nidin: "var(--green)",
   foodpanda: "var(--pink)",
-  "Uber Eats": "var(--green)",
+  "Uber Eats": "var(--blue)",
   "lin.ee": "var(--blue)",
   其他: "var(--amber)",
 };
@@ -166,6 +167,15 @@ function renderTags(values, fallback = "未確認") {
   return `<span class="tag-list">${values.map((value) => `<span class="tag">${value}</span>`).join("")}</span>`;
 }
 
+function evidenceLinks(store) {
+  const links = [];
+  if (store.gmbUrl) links.push(`<a href="${store.gmbUrl}" target="_blank" rel="noreferrer">GMB</a>`);
+  if (store.nidinOrderUrl) links.push(`<a href="${store.nidinOrderUrl}" target="_blank" rel="noreferrer">Nidin</a>`);
+  if (store.providerEvidenceUrl) links.push(`<a href="${store.providerEvidenceUrl}" target="_blank" rel="noreferrer">外送證據</a>`);
+  if (store.officialSourceUrl) links.push(`<a href="${store.officialSourceUrl}" target="_blank" rel="noreferrer">官方</a>`);
+  return links.join("");
+}
+
 function renderRows() {
   state.filtered = state.stores.filter(matchesFilters).sort(sortStores);
   document.getElementById("rowCount").textContent = `${state.filtered.length.toLocaleString("zh-Hant")} 筆`;
@@ -196,10 +206,7 @@ function renderRows() {
         ${renderTags(store.deliveryProviders)}
       </td>
       <td>${renderTags(store.otherProviders, "無")}</td>
-      <td class="links">
-        <a href="${store.gmbUrl}" target="_blank" rel="noreferrer">GMB</a>
-        <a href="${store.officialSourceUrl}" target="_blank" rel="noreferrer">官方</a>
-      </td>
+      <td class="links">${evidenceLinks(store)}</td>
     `;
     body.appendChild(row);
   }
