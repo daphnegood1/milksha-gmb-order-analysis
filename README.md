@@ -1,47 +1,33 @@
-# 迷客夏 GMB 點餐服務統計
+# 臺南迷客夏 GMB 外帶外送分析
 
-這是一個 GitHub Pages 靜態網站，用來整理迷客夏台灣門市的 Google 商家檔案連結、點餐外帶 / 外送服務商與查核狀態。
+這個專案產出一個靜態網頁，用來盤點臺南市迷客夏門市的 Google 商家連結、外帶/外送狀態、服務商與證據來源。
 
 ## 資料來源
 
-- 官方台灣門市列表：<https://www.milksha.com/store_detail.php?uID=1>
-- 原需求指定入口：<https://www.milksha.com/en/store_detail.php?uID=22>
+- 迷客夏官方門市頁：<https://www.milksha.com/store_detail.php?uID=1>
+- Google Places API：若設定 `GOOGLE_MAPS_API_KEY`，資料產生腳本會優先補上 `placeId`、`googleMapsUri`、`businessStatus`、`takeout`、`delivery`
+- 公開資料備援：Nidin 官方點餐資料、Footinder 平台交叉比對、既有人工紀錄
 
-`uID=22` 是查詢介面；`uID=1` 是官方頁面中實際渲染台灣門市卡片的來源。
+服務商判定不會直接等同 GMB 官方欄位。網頁會以「證據來源」與「信心等級」標示資料來源差異。
 
-## 更新資料
+## 重新產生資料
 
 ```powershell
-python tools\fetch_official_stores.py
-python tools\audit_order_providers.py --workers 10
-python tools\audit_nidin_order.py
+python tools\build_tainan_dataset.py
 ```
 
-輸出：
+若目前沒有 Google API key，腳本仍會使用 `data/source-stores.csv` 產出臺南專用資料。
+
+```powershell
+$env:GOOGLE_MAPS_API_KEY="你的 API key"
+python tools\build_tainan_dataset.py
+```
+
+輸出檔案：
 
 - `data/stores.json`
-- `data/summary.json`
-- `data/audit-samples.json`
 - `data/stores.csv`
-
-## 查核狀態
-
-- `confirmed`: 已取得官方頁提供的 Google Maps / GMB 連結。
-- `no_gmb_found`: 找不到 Google 商家檔案。
-- `closed_or_moved`: 歇業或搬遷。
-- `unavailable_or_blocked`: Google 限制或頁面無法讀取。
-- `needs_manual_review`: 需要人工開啟商家檔案確認。
-
-Google 商家檔案的點餐按鈕若受自動化限制，資料不猜測，會保留為未確認。
-
-## 查核來源
-
-- 迷客夏官方門市頁：門市母體與 Google Maps 連結。
-- 迷客夏官方 Nidin 點餐 API：確認官方線上點餐、自取外帶與 Nidin 外送條件。
-- Footinder 店家頁：交叉比對 foodpanda、Uber Eats、lin.ee 等外送供應商。
-- 網站統計將外帶服務商與外送服務商分開計算；`providerCounts` 僅保留為總覽相容欄位。
-
-若 Nidin 與 Footinder 都沒有足夠資料，該門市仍標為需人工確認。
+- `data/summary.json`
 
 ## 本機預覽
 

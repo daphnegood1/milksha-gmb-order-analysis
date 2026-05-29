@@ -3,85 +3,82 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>迷客夏 GMB 點餐服務統計</title>
+    <title>臺南迷客夏 GMB 外帶外送分析</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <header class="hero">
-      <nav class="topbar" aria-label="主要連結">
-        <a href="https://www.milksha.com/store_detail.php?uID=1" target="_blank" rel="noreferrer">官方門市清單</a>
+      <nav class="topbar" aria-label="資料連結">
+        <a href="https://www.milksha.com/store_detail.php?uID=1" target="_blank" rel="noreferrer">迷客夏官方門市</a>
         <a href="data/stores.csv">下載 CSV</a>
-        <a href="data/stores.json">資料 JSON</a>
+        <a href="data/stores.json">檢視 JSON</a>
       </nav>
       <div class="hero-content">
-        <p class="eyebrow">Milksha GMB Order Analysis</p>
-        <h1>迷客夏 GMB 點餐服務統計</h1>
+        <p class="eyebrow">Milksha Tainan GMB Order Analysis</p>
+        <h1>臺南迷客夏 GMB 外帶外送分析</h1>
         <p class="subtitle">
-          以迷客夏官方台灣門市清單為母體，彙整 Google 商家檔案連結、點餐外帶/外送服務商與查核狀態。
+          以臺南市門市為範圍，整理每間店的 Google 商家連結、外帶外送狀態、服務商與證據來源。Google API 欄位可在有金鑰時補上；目前公開資料與人工複核狀態會分開標示。
         </p>
         <dl class="source-meta">
           <div>
-            <dt>查核日期</dt>
-            <dd id="checkedAt">-</dd>
+            <dt>資料產生日期</dt>
+            <dd id="generatedAt">-</dd>
           </div>
           <div>
-            <dt>資料來源</dt>
-            <dd>Milksha 官方門市頁</dd>
+            <dt>來源範圍</dt>
+            <dd>臺南市迷客夏</dd>
+          </div>
+          <div>
+            <dt>Google API</dt>
+            <dd id="googleApiStatus">-</dd>
           </div>
         </dl>
       </div>
     </header>
 
     <main>
-      <section class="metrics" aria-label="統計總覽">
+      <section class="metrics" aria-label="總覽指標">
         <article>
-          <span>官方門市數</span>
-          <strong id="officialStoreCount">0</strong>
+          <span>臺南門市</span>
+          <strong id="storeCount">0</strong>
         </article>
         <article>
-          <span>找到 GMB</span>
+          <span>GMB 連結</span>
           <strong id="gmbFoundCount">0</strong>
         </article>
         <article>
-          <span>外帶</span>
+          <span>外帶可用</span>
           <strong id="takeoutCount">0</strong>
         </article>
         <article>
-          <span>外送</span>
+          <span>外送可用</span>
           <strong id="deliveryCount">0</strong>
         </article>
         <article>
-          <span>未確認</span>
+          <span>待複核</span>
           <strong id="unknownCount">0</strong>
         </article>
       </section>
 
       <section class="notice">
-        <h2>查核說明</h2>
+        <h2>判讀原則</h2>
         <p>
-          官方頁已提供多數門市的 Google Maps 連結；Google 商家檔案的點餐按鈕若受自動化限制，未確認門市會保留在明細並標示待人工查核，不以猜測補值。
+          外帶與外送狀態優先採 Google Places API；若尚未設定 API 金鑰，則使用迷客夏官方門市、Nidin 點餐資料與外送平台索引交叉比對。服務商來源不等於 Google 官方欄位，表格會以證據來源與信心等級區分。
         </p>
       </section>
 
       <section class="panel-grid">
         <article class="panel">
           <div class="panel-head">
-            <h2>外帶 / 外送</h2>
-            <span>以已確認資料計算</span>
-          </div>
-          <div id="orderChart" class="bar-chart"></div>
-        </article>
-        <article class="panel">
-          <div class="panel-head">
-            <h2>外帶服務商</h2>
+            <h2>服務狀態</h2>
             <span>門市數</span>
           </div>
-          <div id="takeoutProviderChart" class="bar-chart"></div>
+          <div id="serviceChart" class="bar-chart"></div>
         </article>
         <article class="panel">
           <div class="panel-head">
             <h2>外送服務商</h2>
-            <span>門市數</span>
+            <span>出現次數</span>
           </div>
           <div id="deliveryProviderChart" class="bar-chart"></div>
         </article>
@@ -94,18 +91,24 @@
             <p id="rowCount">0 筆</p>
           </div>
           <div class="filters">
-            <input id="searchInput" type="search" placeholder="搜尋店名、地址、服務商" />
-            <select id="countyFilter" aria-label="縣市篩選">
-              <option value="">全部縣市</option>
-            </select>
-            <select id="statusFilter" aria-label="狀態篩選">
-              <option value="">全部狀態</option>
+            <input id="searchInput" type="search" placeholder="搜尋店名、行政區、地址或服務商" />
+            <select id="districtFilter" aria-label="行政區篩選">
+              <option value="">全部行政區</option>
             </select>
             <select id="serviceFilter" aria-label="服務篩選">
               <option value="">全部服務</option>
-              <option value="takeout">外帶</option>
-              <option value="delivery">外送</option>
-              <option value="unknown">未確認</option>
+              <option value="takeout">可外帶</option>
+              <option value="delivery">可外送</option>
+              <option value="unknown">待複核</option>
+            </select>
+            <select id="providerFilter" aria-label="服務商篩選">
+              <option value="">全部服務商</option>
+            </select>
+            <select id="confidenceFilter" aria-label="信心等級篩選">
+              <option value="">全部信心等級</option>
+              <option value="high">高</option>
+              <option value="medium">中</option>
+              <option value="low">低</option>
             </select>
           </div>
         </div>
@@ -113,12 +116,13 @@
           <table>
             <thead>
               <tr>
-                <th data-sort="storeName">門市</th>
-                <th data-sort="county">地區</th>
-                <th>GMB 狀態</th>
-                <th>外帶服務商</th>
-                <th>外送服務商</th>
-                <th>其他服務商</th>
+                <th data-sort="storeName">店家</th>
+                <th data-sort="district">行政區</th>
+                <th>外帶</th>
+                <th>外送</th>
+                <th>服務商</th>
+                <th>證據來源</th>
+                <th data-sort="confidence">信心</th>
                 <th>連結</th>
               </tr>
             </thead>
@@ -129,7 +133,9 @@
     </main>
 
     <footer>
-      <p>本頁為公開查核資料網站。資料檔保留於專案內，方便未來重新抓取與補查。</p>
+      <p>
+        本頁是 GMB 外帶外送盤點工具。當 Google Places API 或 GMB 點餐按鈕未完成複核時，服務商判定會明確標示為公開資料交叉比對或待人工確認。
+      </p>
     </footer>
 
     <script src="app.js"></script>

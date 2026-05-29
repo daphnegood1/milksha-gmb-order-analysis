@@ -1,37 +1,31 @@
 {
-  "generatedAt": "2026-05-28",
-  "officialStoreCount": 335,
-  "gmbFoundCount": 335,
-  "takeoutCount": 315,
-  "deliveryCount": 303,
-  "unknownCount": 32,
+  "generatedAt": "2026-05-29",
+  "sourceCheckedAt": "2026-05-28",
+  "scope": "臺南市迷客夏",
+  "storeCount": 37,
+  "gmbFoundCount": 37,
+  "takeoutCount": 35,
+  "deliveryCount": 35,
+  "unknownCount": 2,
   "providerCounts": {
-    "Nidin": 315,
-    "Uber Eats": 118,
-    "foodpanda": 135,
-    "lin.ee": 2
+    "Nidin": 35,
+    "Uber Eats": 16,
+    "foodpanda": 19,
+    "lin.ee": 1
   },
   "takeoutProviderCounts": {
-    "Nidin": 315,
+    "Nidin": 35,
     "Uber Eats": 1,
     "foodpanda": 1
   },
   "deliveryProviderCounts": {
-    "Nidin": 302,
-    "Uber Eats": 118,
-    "foodpanda": 135
+    "Nidin": 35,
+    "Uber Eats": 16,
+    "foodpanda": 19
   },
-  "otherProviderCounts": {
-    "lin.ee": 2
-  },
-  "gmbStatusCounts": {
-    "confirmed": 335
-  },
-  "source": {
+  "sources": {
     "officialStoreList": "https://www.milksha.com/store_detail.php?uID=1",
-    "plannedSourceFromRequest": "https://www.milksha.com/en/store_detail.php?uID=22",
-    "notes": "uID=22 is the search page. uID=1 is the official Taiwan listing page that renders store cards."
-  },
-  "nidinMatchedCount": 315,
-  "nidinSource": "https://milksha.nidin.shop/"
+    "googlePlacesApi": "not configured",
+    "fallback": "data/source-stores.csv"
+  }
 }
