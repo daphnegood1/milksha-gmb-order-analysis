@@ -63,7 +63,7 @@
       <section class="notice">
         <h2>判讀原則</h2>
         <p>
-          外帶與外送狀態優先採 Google Places API；若尚未設定 API 金鑰，則使用迷客夏官方門市、Nidin 點餐資料與外送平台索引交叉比對。服務商來源不等於 Google 官方欄位，表格會以證據來源與信心等級區分。
+          GMB 可直接觀察的訊息包含「線上點餐」按鈕，以及「外帶 / 外送」屬性是否打勾；但供應商名稱通常要點進點餐流程或用其他來源補證。尚未設定 Google API 金鑰時，本頁會使用 Nidin 官方點餐資料與外送平台索引交叉比對，並標示為非 GMB 直接供應商判定。
         </p>
       </section>
 
@@ -118,10 +118,10 @@
               <tr>
                 <th data-sort="storeName">店家</th>
                 <th data-sort="district">行政區</th>
-                <th>外帶</th>
-                <th>外送</th>
-                <th>服務商</th>
-                <th>證據來源</th>
+                <th>外帶狀態</th>
+                <th>外送狀態</th>
+                <th>供應商證據</th>
+                <th>判斷來源</th>
                 <th data-sort="confidence">信心</th>
                 <th>連結</th>
               </tr>

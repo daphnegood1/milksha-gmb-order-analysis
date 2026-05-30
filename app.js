@@ -32,6 +32,16 @@ function boolLabel(value) {
   return "待複核";
 }
 
+function serviceSourceLabel(store) {
+  if (store.gmbEvidence?.takeout === "Google Places API" || store.gmbEvidence?.delivery === "Google Places API") {
+    return "Google API 確認";
+  }
+  if (store.manualReviewStatus === "needs_review") {
+    return "待 GMB/API 複核";
+  }
+  return "公開資料交叉比對";
+}
+
 function boolClass(value) {
   if (value === true) return "confirmed";
   if (value === false) return "none";
@@ -173,7 +183,18 @@ function evidenceText(store) {
     items.push("Footinder 平台交叉比對");
   }
   if (store.manualReviewStatus === "needs_review") items.push("待人工複核");
-  return items.length ? items.join("、") : "公開資料";
+  if (items.length) return items.join("、");
+  return "公開資料交叉比對";
+}
+
+function providerEvidenceNote(store) {
+  if (!Array.isArray(store.providerNames) || !store.providerNames.length) {
+    return "尚未確認供應商";
+  }
+  if (store.gmbEvidence?.takeout === "Google Places API" || store.gmbEvidence?.delivery === "Google Places API") {
+    return "供應商仍需點開 GMB 點餐流程確認";
+  }
+  return "供應商來自 Nidin / 外部平台證據，非 GMB 直接欄位";
 }
 
 function evidenceLinks(store) {
@@ -203,13 +224,18 @@ function renderRows() {
       </td>
       <td>
         <span class="tag ${boolClass(store.takeoutAvailable)}">${boolLabel(store.takeoutAvailable)}</span>
+        <div class="small">${serviceSourceLabel(store)}</div>
         ${renderTags(store.takeoutProviders, "服務商待確認")}
       </td>
       <td>
         <span class="tag ${boolClass(store.deliveryAvailable)}">${boolLabel(store.deliveryAvailable)}</span>
+        <div class="small">${serviceSourceLabel(store)}</div>
         ${renderTags(store.deliveryProviders, "服務商待確認")}
       </td>
-      <td>${renderTags(store.providerNames, "待確認")}</td>
+      <td>
+        ${renderTags(store.providerNames, "待確認")}
+        <div class="small">${providerEvidenceNote(store)}</div>
+      </td>
       <td>
         <div>${evidenceText(store)}</div>
         <div class="small">${store.verificationNote || ""}</div>

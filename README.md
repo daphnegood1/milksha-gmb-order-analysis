@@ -8,7 +8,7 @@
 - Google Places API：若設定 `GOOGLE_MAPS_API_KEY`，資料產生腳本會優先補上 `placeId`、`googleMapsUri`、`businessStatus`、`takeout`、`delivery`
 - 公開資料備援：Nidin 官方點餐資料、Footinder 平台交叉比對、既有人工紀錄
 
-服務商判定不會直接等同 GMB 官方欄位。網頁會以「證據來源」與「信心等級」標示資料來源差異。
+GMB 可直接觀察的訊息是「線上點餐」按鈕，以及「外帶 / 外送」屬性是否打勾。供應商名稱通常不等於 GMB 官方欄位，需點進點餐流程、使用 Google API，或用 Nidin / 外送平台資料補證。網頁會以「判斷來源」與「信心等級」標示資料來源差異。
 
 ## 重新產生資料
 
